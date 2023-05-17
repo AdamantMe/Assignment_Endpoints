@@ -1,4 +1,5 @@
 ﻿using Assignment_Endpoints.Models;
+using Assignment_Endpoints.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Assignment_Endpoints.Controllers
@@ -7,27 +8,53 @@ namespace Assignment_Endpoints.Controllers
     [Route("v1/diff")]
     public class DiffCheckController : ControllerBase
     {
-        //public IActionResult Index()
-        //{
 
-        //}
+        private readonly DiffService DiffService;
+        public DiffCheckController(DiffService diffService)
+        {
+            // Dependency injection for DiffService
+            DiffService = diffService;
+        }
 
-        private static Dictionary<int, string> DiffsLeft = new Dictionary<int, string>();
-        private static Dictionary<int, string> DiffsRight = new Dictionary<int, string>();
-
+        static Dictionary<int, string> InputsLeft = new Dictionary<int, string>();
+        static Dictionary<int, string> InputsRight = new Dictionary<int, string>();
 
         [HttpPost("{id}/left")]
         public IActionResult SetLeft(int id, [FromBody] InputModel model)
         {
             var base64EncodedJson = model.Input;
             var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedJson));
-            DiffsLeft[id] = json;
-
-
+            InputsLeft[id] = json;
 
             return Ok();
         }
 
+        [HttpPost("{id}/right")]
+        public IActionResult SetRight(int id, [FromBody] InputModel model)
+        {
+            var base64EncodedJson = model.Input;
+            var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedJson));
+            InputsRight[id] = json;
+
+            return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Diff(int id)
+        {
+            if (!InputsLeft.ContainsKey(id) || !InputsRight.ContainsKey(id))
+            {
+                return BadRequest("Not all inputs were provided for this id");
+            }
+
+            string left = InputsLeft[id];
+            string right = InputsRight[id];
+
+            // The actual diff finding logic is in DiffService class (separation of concerns)
+            var diffResult = DiffService.GetDiff(left, right);
+
+            return Ok(diffResult);
+        }
 
 
 
