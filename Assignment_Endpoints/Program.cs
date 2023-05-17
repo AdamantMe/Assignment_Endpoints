@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 // Dependency injection for DiffService
 builder.Services.AddSingleton<DiffService>();
+builder.Services.AddSingleton<EncodingService>();
 
 var app = builder.Build();
 

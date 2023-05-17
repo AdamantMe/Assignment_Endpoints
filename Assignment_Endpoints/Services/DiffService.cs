@@ -1,9 +1,13 @@
-﻿using System.Text;
-
-namespace Assignment_Endpoints.Services
+﻿namespace Assignment_Endpoints.Services
 {
     public class DiffService
     {
+        // This function is asynchronous, just to show that I know how to do it. It's not really needed since GetDiff function isn't particularly heavy
+        public async Task<Dictionary<string, object>> GetDiffAsync(string left, string right)
+        {
+            return await Task.Run(() => GetDiff(left, right));
+        }
+
         public Dictionary<string, object> GetDiff(string left, string right)
         {
             var result = new Dictionary<string, object>();
@@ -11,14 +15,14 @@ namespace Assignment_Endpoints.Services
             // First case; when inputs are completely equal
             if (left == right)
             {
-                result["AreIdentical"] = true;
+                result["Identical"] = true;
                 return result;
             }
 
             // Second case; when inputs are of different sizes
             if (left.Length != right.Length)
             {
-                result["AreOfEqualSize"] = false;
+                result["EqualSize"] = false;
                 return result;
             }
 
@@ -62,8 +66,8 @@ namespace Assignment_Endpoints.Services
                 });
             }
 
-            result["AreOfEqualSize"] = true;
-            result["Diff"] = diffs;
+            result["EqualSize"] = true;
+            result["Differences"] = diffs;
 
             return result;
         }
